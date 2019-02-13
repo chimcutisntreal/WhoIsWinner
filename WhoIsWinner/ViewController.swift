@@ -15,9 +15,10 @@ class ViewController: UIViewController, GADBannerViewDelegate {
     @IBOutlet weak var bannerView: GADBannerView!
     @IBOutlet weak var titleLabel: UILabel!
     @IBOutlet weak var numberPButton: NumberPlayersButton!
+    @IBOutlet weak var cancelButton: UIButton!
+    @IBOutlet weak var doneButton: UIButton!
     
     var numberView: UIView!
-    var isClickedAgain = false
     var isReceived = false
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -29,6 +30,8 @@ class ViewController: UIViewController, GADBannerViewDelegate {
         bannerView?.rootViewController = self
         bannerView?.load(GADRequest())
         
+        cancelButton.isHidden = true
+        doneButton.isHidden = true
         // Do any additional setup after loading the view, typically from a nib.
     }
  
@@ -54,34 +57,43 @@ class ViewController: UIViewController, GADBannerViewDelegate {
     
     @IBAction func pressOnNP(_ sender: Any) {
         if isReceived == true {
-            if isClickedAgain == false {
-                UIView.animate(withDuration: 0.5, delay: 0.1, animations: {
-                    
-                    let scaleOrigin = CGAffineTransform(scaleX: 0.3, y: 0.3)
-                    let rotationOrigin = CGAffineTransform(rotationAngle: .pi)
-                    self.numberPButton.transform = scaleOrigin.concatenating(rotationOrigin)
-                    self.numberPButton.frame.origin.x += 130
-                    self.numberPButton.frame.origin.y += 230
-                   
-                })
+//            self.numberPButton.isHidden = true
+            self.cancelButton.isHidden = false
+            self.doneButton.isHidden = false
+            UIView.animate(withDuration: 0.4, animations: {
+                let scaleCancel = CGAffineTransform(scaleX: 0.25, y: 0.25)
+                let rotationCancel = CGAffineTransform(rotationAngle: .pi)
+                let translationCancel = CGAffineTransform(translationX: 130, y: 230)
+                self.cancelButton.transform = scaleCancel.concatenating(rotationCancel).concatenating(translationCancel)
                 
-                isClickedAgain = true
-            } else {
-                UIView.animate(withDuration: 0.5, delay: 0.1, animations: {
-                    
-                    self.numberPButton.transform = CGAffineTransform(scaleX: 1, y: 1)
-                    self.numberPButton.frame.origin.x -= 130
-                    self.numberPButton.frame.origin.y -= 230
-                    
-                })
-                self.numberPButton.setTitle("Number Of Players", for: .normal)
-                self.numberPButton.titleLabel?.font = UIFont(name: "Marker Felt", size: 18)
-                isClickedAgain = false
-            }
+                let scaleDone = CGAffineTransform(scaleX: 0.25, y: 0.25)
+                let rotationDone = CGAffineTransform(rotationAngle: .pi)
+                let translationDone = CGAffineTransform(translationX: -130, y: 230)
+                self.doneButton.transform = scaleDone.concatenating(rotationDone).concatenating(translationDone)
+                self.doneButton.image(for: .normal)
+                
+                self.cancelButton.alpha = 1
+                self.doneButton.alpha = 1
+                self.numberPButton.alpha = 0
+                self.titleLabel.transform = CGAffineTransform(translationX: 0, y: -200)
+            })
+
         } else {
             print("have not received banner yet")
         }
-        
+    }
+    @IBAction func pressOnCancel(_ sender: Any) {
+        UIView.animate(withDuration: 0.4, animations: {
+            self.cancelButton.transform = CGAffineTransform(translationX: 0, y: 0)
+            self.doneButton.transform = CGAffineTransform(translationX: 0, y: 0)
+            self.titleLabel.transform = CGAffineTransform(translationX: 0, y: 0)
+            
+        })
+        UIView.animate(withDuration: 0.3, delay: 0.3, animations: {
+            self.cancelButton.alpha = 0
+            self.doneButton.alpha = 0
+            self.numberPButton.alpha = 1
+        })
     }
     
 }
@@ -105,6 +117,15 @@ extension UIViewController {
         
         pastelView.startAnimation()
         view.insertSubview(pastelView, at: 0)
+    }
+}
+extension UIButton {
+    func customCancelButton(){
+        self.layer.borderWidth = 3
+        self.layer.shadowRadius = 50
+        self.layer.shadowOpacity = 1.0
+        self.layer.shadowColor = UIColor.white.cgColor
+        self.layer.shadowOffset = CGSize(width: 5, height: 5)
     }
 }
 
